@@ -61,7 +61,7 @@ public class TippedArrowDupe extends Module {
     private final List<Pair<Long, Runnable>> scheduledTasks = new ArrayList<>();
 
     public TippedArrowDupe() {
-        super(YourAddon.CATEGORY, "tipped-arrow-dupe", "Dupes all tipped arrows using bow");
+        super(Categories.Misc, "tipped-arrow-dupe", "Dupes all tipped arrows using bow");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
