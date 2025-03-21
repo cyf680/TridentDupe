@@ -7,14 +7,14 @@ import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import org.slf4j.Logger;
 
-public class TridentDupe extends MeteorAddon {
+public class TippedArrowDupe extends MeteorAddon {
     public static final Logger LOG = LogUtils.getLogger();
     public static final Category CATEGORY = new Category("Dupes");
 
     @Override
     public void onInitialize() {
         LOG.info("Initializing Meteor Addon Template");
-        Modules.get().add(new com.example.addon.modules.TridentDupe());
+        Modules.get().add(new com.example.addon.modules.TippedArrowDupe());
     }
 
     @Override
