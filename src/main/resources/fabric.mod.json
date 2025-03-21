@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "trident-dupe",
+  "id": "tipped-arrow-dupe",
   "version": "${version}",
-  "name": "Trident Dupe",
-  "description": "Trident Dupe for Meteor Client",
+  "name": "arrow Dupe",
+  "description": "arrow Dupe for Meteor Client",
   "authors": [
     "Laztec","Killet","Ionar"
   ],
@@ -14,11 +14,11 @@
   "environment": "client",
   "entrypoints": {
     "meteor": [
-      "com.example.addon.TridentDupe"
+      "com.example.addon.TippedArrowDupe"
     ]
   },
   "mixins": [
-    "trident-dupe.mixins.json"
+    "tipped-arrow-dupe.mixins.json"
   ],
   "custom": {
     "meteor-client:color": "225,25,25"
