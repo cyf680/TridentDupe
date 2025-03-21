@@ -15,6 +15,7 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
