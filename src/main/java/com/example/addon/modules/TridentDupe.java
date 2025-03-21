@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SpectralArrowDupe extends Module {
+public class TippedArrowDupe extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     
     private final Setting<Double> delay = sgGeneral.add(new DoubleSetting.Builder()
@@ -59,8 +59,8 @@ public class SpectralArrowDupe extends Module {
     private boolean cancelPackets;
     private final List<Pair<Long, Runnable>> scheduledTasks = new ArrayList<>();
 
-    public SpectralArrowDupe() {
-        super(YourAddon.CATEGORY, "spectral-arrow-dupe", "Dupes spectral arrows using bow");
+    public TippedArrowDupe() {
+        super(YourAddon.CATEGORY, "tipped-arrow-dupe", "Dupes all tipped arrows using bow");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -82,8 +82,7 @@ public class SpectralArrowDupe extends Module {
 
     private boolean validateSetup() {
         if (mc.player.getInventory().getStack(0).getItem() != Items.BOW) return false;
-        if (mc.player.getInventory().getStack(arrowSlot.get()).getItem() != Items.SPECTRAL_ARROW) return false;
-        return true;
+        return mc.player.getInventory().getStack(arrowSlot.get()).getItem() == Items.TIPPED_ARROW;
     }
 
     private void startDupeCycle() {
