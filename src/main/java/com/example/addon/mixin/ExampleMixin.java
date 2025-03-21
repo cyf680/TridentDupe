@@ -1,6 +1,6 @@
 package com.example.addon.mixin;
 
-import com.example.addon.TippedArrowDupe;
+import com.example.addon.TridentDupe;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
 import org.spongepowered.asm.mixin.Mixin;
