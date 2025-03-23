@@ -49,7 +49,7 @@ public class TippedArrowDupe extends Module {
     );
 
     public TippedArrowDupe() {
-        super(com.example.addon. TippedArrowDupe.CATEGORY, "tipped-arrow-dupe", "Dupes tipped arrows in second hotbar slot bow in first hotbar slot. / / Killet / / Laztec / / Ionar");
+        super(com.example.addon.TippedArrowDupe.CATEGORY, "tipped-arrow-dupe", "Dupes tipped arrows in second hotbar slot bow in first hotbar slot. / / Killet / / Laztec / / Ionar");
     }
 
     private boolean banClickSlotAndPlayerActionPacket;
@@ -119,11 +119,11 @@ public class TippedArrowDupe extends Module {
     private final List<Pair<Long, Runnable>> scheduledTasks2 = new ArrayList<>();
 
     public void scheduleTask(Runnable task, double delayMillis) {
-        double executeTime = System.currentTimeMillis() + delayMillis;
+    long executeTime = System.currentTimeMillis() + (long) delayMillis;
         scheduledTasks.add(new Pair<>(executeTime, task));
     }
     public void scheduleTask2(Runnable task, double delayMillis) {
-        long executeTime = System.currentTimeMillis() + delayMillis;
+    long executeTime = System.currentTimeMillis() + (long) delayMillis;
         scheduledTasks2.add(new Pair<>(executeTime, task));
     }
 
