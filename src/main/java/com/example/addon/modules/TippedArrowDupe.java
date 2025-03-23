@@ -30,7 +30,7 @@ import net.minecraft.util.math.Direction;
 
 import java.util.*;
 
-public class TridentDupe extends Module {
+public class TippedArrowDupe extends Module {
     // Coded by Killet Laztec & Ionar - Modified by cyf680 :3 爱来自瓷器
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final Setting<Double> delay = sgGeneral.add(new DoubleSetting.Builder()
