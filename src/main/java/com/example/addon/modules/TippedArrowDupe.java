@@ -95,6 +95,8 @@ public class TippedArrowDupe extends Module {
             // 物品栏 左键点击 3（合成格子左下角那一格）
             // 重点在于这里，SWAP 在 Bukkit 接口称为 HOTBAR_SWAP
             // 也就是将这个格子的物品与快捷栏的物品进行交换
+            // 这是 Bukkit 可以监听到的 InventoryClickEvent，所以很容易解决它
+            // 只要物品没有移动成功，就刷不了
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId,
                 3, 1, SlotActionType.SWAP, mc.player);
 
@@ -116,11 +118,11 @@ public class TippedArrowDupe extends Module {
     private final List<Pair<Long, Runnable>> scheduledTasks = new ArrayList<>();
     private final List<Pair<Long, Runnable>> scheduledTasks2 = new ArrayList<>();
 
-    public void scheduleTask(Runnable task, long delayMillis) {
+    public void scheduleTask(Runnable task, double delayMillis) {
         long executeTime = System.currentTimeMillis() + delayMillis;
         scheduledTasks.add(new Pair<>(executeTime, task));
     }
-    public void scheduleTask2(Runnable task, long delayMillis) {
+    public void scheduleTask2(Runnable task, double delayMillis) {
         long executeTime = System.currentTimeMillis() + delayMillis;
         scheduledTasks2.add(new Pair<>(executeTime, task));
     }
