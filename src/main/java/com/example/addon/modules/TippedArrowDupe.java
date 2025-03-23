@@ -9,136 +9,147 @@ import meteordevelopment.meteorclient.events.game.GameLeftEvent;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.settings.BoolSetting;
+import meteordevelopment.meteorclient.settings.DoubleSetting;
+import meteordevelopment.meteorclient.settings.Setting;
+import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.*;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
-public class TippedArrowDupe extends Module {
+import java.util.*;
+
+public class TridentDupe extends Module {
+    // Coded by Killet Laztec & Ionar - Modified by cyf680 :3 爱来自瓷器
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    
     private final Setting<Double> delay = sgGeneral.add(new DoubleSetting.Builder()
-        .name("delay")
-        .defaultValue(3.0)
-        .min(0)
+        .name("dupe-delay")
+        .description("Raise this if it isn't working. This is how fast you'll dupe. 5 is good for most.")
+        .defaultValue(5)
         .build()
     );
+
 
     private final Setting<Double> chargeDelay = sgGeneral.add(new DoubleSetting.Builder()
         .name("charge-delay")
-        .defaultValue(1.0)
-        .min(0)
+        .description("Delay between trident charge and throw. Increase if experiencing issues/lag.")
+        .defaultValue(5)
         .build()
     );
-
-    private final Setting<Integer> arrowSlot = sgGeneral.add(new IntSetting.Builder()
-        .name("arrow-slot")
-        .defaultValue(35)
-        .range(0, 35)
-        .build()
-    );
-
-    private final Setting<Integer> craftingSlot = sgGeneral.add(new IntSetting.Builder()
-        .name("crafting-slot")
-        .defaultValue(1)
-        .range(1, 4)
-        .build()
-    );
-
-    private boolean cancelPackets;
-    private final List<Pair<Long, Runnable>> scheduledTasks = new ArrayList<>();
 
     public TippedArrowDupe() {
-        super(Categories.Misc, "tipped-arrow-dupe", "Dupes all tipped arrows using bow");
+        super(com.example.addon. TippedArrowDupe.CATEGORY, "tipped-arrow-dupe", "Dupes tipped arrows in second hotbar slot bow in first hotbar slot. / / Killet / / Laztec / / Ionar");
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    private void onPacketSend(PacketEvent.Send event) {
-        if (cancelPackets && (event.packet instanceof PlayerActionC2SPacket || event.packet instanceof ClickSlotC2SPacket)) {
-            event.cancel();
+    private boolean banClickSlotAndPlayerActionPacket;
+    @EventHandler(priority = EventPriority.HIGHEST + 1)
+    private void onSendPacket(PacketEvent.Send event) {
+
+        if (event.packet instanceof ClientTickEndC2SPacket
+            || event.packet instanceof PlayerMoveC2SPacket
+            || event.packet instanceof CloseHandledScreenC2SPacket)
+            return;
+
+        if (!(event.packet instanceof ClickSlotC2SPacket)
+            && !(event.packet instanceof PlayerActionC2SPacket))
+        {
+            return;
         }
+        if (!banClickSlotAndPlayerActionPacket)
+            return;
+        event.cancel();
     }
 
     @Override
-    public void onActivate() {
-        if (mc.player == null) return;
-        if (!validateSetup()) {
-            this.toggle();
+    public void onActivate()
+    {
+        if (mc.player == null)
             return;
-        }
-        startDupeCycle();
+
+        scheduledTasks.clear();
+        dupe();
     }
 
-    private boolean validateSetup() {
-        if (mc.player.getInventory().getStack(0).getItem() != Items.BOW) return false;
-        return mc.player.getInventory().getStack(arrowSlot.get()).getItem() == Items.TIPPED_ARROW;
-    }
+    private void dupe()
+    {
 
-    private void startDupeCycle() {
-        moveArrowToCrafting();
-        cancelPackets = true;
-        scheduleTask(this::handleBowAction, 50);
-    }
-
-    private void handleBowAction() {
+        // 先右键交互点击一下主手物品
+        // 即告诉服务端“我开始右键长按了，三叉戟该开始瞄准了”
         mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-        scheduleTask(this::releaseBow, (long)(chargeDelay.get() * 1000));
+        banClickSlotAndPlayerActionPacket = true;
+
+        // 然后使用 定时器1 延时 500ms
+        scheduleTask(() -> {
+            banClickSlotAndPlayerActionPacket = false;
+            // 物品栏 左键点击 3（合成格子左下角那一格）
+            // 重点在于这里，SWAP 在 Bukkit 接口称为 HOTBAR_SWAP
+            // 也就是将这个格子的物品与快捷栏的物品进行交换
+            // 这是 Bukkit 可以监听到的 InventoryClickEvent，所以很容易解决它
+            // 只要物品没有移动成功，就刷不了
+            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId,
+                3, 1, SlotActionType.SWAP, mc.player);
+
+            // 发一个包 玩家动作 RELEASE USE ITEM
+            // 即告诉服务端“我松开鼠标了，要发射三叉戟了”
+            PlayerActionC2SPacket packet2 = new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.RELEASE_USE_ITEM,
+                BlockPos.ORIGIN,
+                Direction.DOWN,
+                0);
+            mc.getNetworkHandler().sendPacket(packet2);
+
+            banClickSlotAndPlayerActionPacket = true;
+            // 用 定时器2 延时 500ms，再来一次
+            scheduleTask2(this::dupe, delay.get() * 100);
+        }, chargeDelay.get() * 100);
     }
 
-    private void releaseBow() {
-        mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(
-            PlayerActionC2SPacket.Action.RELEASE_USE_ITEM,
-            BlockPos.ORIGIN,
-            Direction.DOWN,
-            0
-        ));
-        moveArrowBack();
-        scheduleTask(this::startDupeCycle, (long)(delay.get() * 1000));
-    }
+    private final List<Pair<Long, Runnable>> scheduledTasks = new ArrayList<>();
+    private final List<Pair<Long, Runnable>> scheduledTasks2 = new ArrayList<>();
 
-    private void moveArrowToCrafting() {
-        clickSlot(arrowSlot.get(), craftingSlot.get());
+    public void scheduleTask(Runnable task, long delayMillis) {
+        long executeTime = System.currentTimeMillis() + delayMillis;
+        scheduledTasks.add(new Pair<>(executeTime, task));
     }
-
-    private void moveArrowBack() {
-        clickSlot(craftingSlot.get(), arrowSlot.get());
-    }
-
-    private void clickSlot(int from, int to) {
-        mc.interactionManager.clickSlot(
-            mc.player.currentScreenHandler.syncId,
-            from,
-            to,
-            SlotActionType.SWAP,
-            mc.player
-        );
-    }
-
-    private void scheduleTask(Runnable task, long delay) {
-        scheduledTasks.add(new Pair<>(System.currentTimeMillis() + delay, task));
+    public void scheduleTask2(Runnable task, long delayMillis) {
+        long executeTime = System.currentTimeMillis() + delayMillis;
+        scheduledTasks2.add(new Pair<>(executeTime, task));
     }
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
-        Iterator<Pair<Long, Runnable>> iterator = scheduledTasks.iterator();
-        while (iterator.hasNext()) {
-            Pair<Long, Runnable> entry = iterator.next();
-            if (System.currentTimeMillis() >= entry.getLeft()) {
-                entry.getRight().run();
-                iterator.remove();
+        long currentTime = System.currentTimeMillis();
+        {
+            Iterator<Pair<Long, Runnable>> iterator = scheduledTasks.iterator();
+
+            while (iterator.hasNext()) {
+                Pair<Long, Runnable> entry = iterator.next();
+                if (entry.getLeft() <= currentTime) {
+                    entry.getRight().run();
+                    iterator.remove(); // Remove executed task from the list
+                }
+            }
+        }
+        {
+            Iterator<Pair<Long, Runnable>> iterator = scheduledTasks2.iterator();
+
+            while (iterator.hasNext()) {
+                Pair<Long, Runnable> entry = iterator.next();
+                if (entry.getLeft() <= currentTime) {
+                    entry.getRight().run();
+                    iterator.remove(); // Remove executed task from the list
+                }
             }
         }
     }
@@ -154,4 +165,5 @@ public class TippedArrowDupe extends Module {
             toggle();
         }
     }
+
 }
