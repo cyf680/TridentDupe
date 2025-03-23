@@ -119,7 +119,7 @@ public class TippedArrowDupe extends Module {
     private final List<Pair<Long, Runnable>> scheduledTasks2 = new ArrayList<>();
 
     public void scheduleTask(Runnable task, double delayMillis) {
-        long executeTime = System.currentTimeMillis() + delayMillis;
+        double executeTime = System.currentTimeMillis() + delayMillis;
         scheduledTasks.add(new Pair<>(executeTime, task));
     }
     public void scheduleTask2(Runnable task, double delayMillis) {
@@ -129,7 +129,7 @@ public class TippedArrowDupe extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
-        long currentTime = System.currentTimeMillis();
+        double currentTime = System.currentTimeMillis();
         {
             Iterator<Pair<Long, Runnable>> iterator = scheduledTasks.iterator();
 
