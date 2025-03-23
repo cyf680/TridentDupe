@@ -99,6 +99,8 @@ public class TippedArrowDupe extends Module {
             // 只要物品没有移动成功，就刷不了
             mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId,
                 3, 1, SlotActionType.SWAP, mc.player);
+            mc.interactionManager.clickSlot(mc.player.currentScreenHandler.syncId,
+                4, 0, SlotActionType.SWAP, mc.player);
 
             // 发一个包 玩家动作 RELEASE USE ITEM
             // 即告诉服务端“我松开鼠标了，要发射三叉戟了”
