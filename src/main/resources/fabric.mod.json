@@ -3,9 +3,9 @@
   "id": "tipped-arrow-dupe",
   "version": "${version}",
   "name": "arrow Dupe",
-  "description": "arrow Dupe for Meteor Client",
+  "description": "Tipped Arrow Dupe for Meteor Client",
   "authors": [
-    "Laztec","Killet","Ionar"
+    "Laztec","Killet","Ionar","cyf680"
   ],
   "contact": {
     "repo": "https://github.com/Killetx/TridentDupe"
