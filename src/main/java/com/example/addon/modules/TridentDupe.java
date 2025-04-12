@@ -45,7 +45,7 @@ public class TridentDupe extends Module {
     private final Setting<Double> chargeDelay = sgGeneral.add(new DoubleSetting.Builder()
         .name("charge-delay")
         .description("Delay between trident charge and throw. Increase if experiencing issues/lag.")
-        .defaultValue(5)
+        .defaultValue(1)
         .build()
     );
 
@@ -138,7 +138,7 @@ public class TridentDupe extends Module {
 
             cancel = true;
             scheduleTask2(this::dupe, delay.get() * 100);
-        }, chargeDelay.get() * 100);
+        }, chargeDelay.get() * 500);
     }
 
 
